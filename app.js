@@ -16,7 +16,7 @@ fs.createReadStream('contacts.csv')
     }
 })
 .on('end', () => {
-    // console.log(contacts);
+    console.log(contacts);
 });
 
 let counter = { fails: 0, success: 0 }
@@ -55,26 +55,18 @@ client.on('authenticated', (session) => {
     });
 });
 */
-
-client.on('auth_failure', msg => {
-    // Fired if session restore was unsuccessfull
-    console.error('AUTHENTICATION FAILURE', msg);
-});
-
-client.on('ready', () => {
-    console.log('Client is ready!');
-    deploy_all();
-});
-
-client.on('disconnected', (reason) => {
-    console.log('Client was logged out', reason);
-});
-
 async function deploy_all() {
     for (const contact of contacts) {
-        const final_number = (contact.length > 10) ? `${contact}@c.us` : `91${contact}@c.us`;
-        const isRegistered = await client.isRegisteredUser(final_number);
-        if (isRegistered) {
+        const final_number = (contact.length > 10) ? `${contact}@c.us` : `20${contact}@c.us`;
+        console.log(final_number)
+        // const isRegistered = await client.isRegisteredUser(final_number);
+        // console.log(isRegistered)
+        console.log('started')
+            const msg = await client.sendMessage(final_number, message);
+            console.log(`${contact} Sent`);
+            counter.success++;
+        if (false) {
+            console.log('started')
             const msg = await client.sendMessage(final_number, message);
             console.log(`${contact} Sent`);
             counter.success++;
@@ -90,6 +82,22 @@ async function deploy_all() {
     }
     console.log(`Result: ${counter.success} sent, ${counter.fails} failed`);
 }
+
+client.on('auth_failure', msg => {
+    // Fired if session restore was unsuccessfull
+    console.error('AUTHENTICATION FAILURE', msg);
+});
+
+client.on('ready', () => {
+    console.log('Client is ready!');
+    deploy_all();
+});
+
+client.on('disconnected', (reason) => {
+    console.log('Client was logged out', reason);
+});
+
+
 
 async function deleteChat(phoneNumber) {
     return new Promise((resolve, reject) => {
